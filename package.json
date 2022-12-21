@@ -1,0 +1,33 @@
+{
+  "name": "raspberry_electron",
+  "version": "12.0.4",
+  "description": "A single file nodejs server",
+  "main": "main.js",
+  "scripts": {
+    "start": "node main.js"
+  },
+  "keywords": [
+    "nodejs",
+    "main"
+  ],
+  "author": "Lupandin Denys",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^22.0.0"
+  },
+  "dependencies": {
+    "croxydb": "^0.0.7",
+    "date-and-time": "^2.4.1",
+    "electron-localstorage": "^1.0.5",
+    "fs": "^0.0.1-security",
+    "https": "^1.0.0",
+    "md5": "^2.3.0",
+    "mpg321": "^0.1.5",
+    "mysql": "^2.18.1",
+    "mysql2": "^2.3.3",
+    "node-time": "^0.1.0",
+    "path": "^0.12.7",
+    "pm2": "^5.2.2",
+    "shell": "^0.5.1"
+  }
+}
