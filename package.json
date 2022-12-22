@@ -1,6 +1,6 @@
 {
   "name": "raspberry_electron",
-  "version": "12.4.4",
+  "version": "12.6.4",
   "description": "A single file nodejs server",
   "main": "main.js",
   "scripts": {
