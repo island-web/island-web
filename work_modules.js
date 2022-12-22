@@ -97,7 +97,7 @@ function checkSize_and_indir(name, path = 'music/') {
         }else if(checkFile(name) && Math.trunc(fileSizeInBytes) != parseInt(response.headers["content-length"])){
             db.push(`buffer_download`, name)
         }
-        if(db.get('buffer_download').length > 0){
+        if(db.get('buffer_download')){
             if (process.send) { process.send(`DOWNLOAD_SONGS`) }
         }
     })
