@@ -52,6 +52,12 @@ player_songs.on('end', function () {
 player_songs.on('error', function(e){
     console.log(`PLAYER PLAY ERROR: ${e}`);
     count_list_songs++;
-    if(errors > 10) fs.writeFileSync(`server/logs.js`, `PLAYER PLAY ERROR: ${e}/n`, { flag: 'a+' });
+    if(errors > 10) {
+        setInterval(function () { 
+            child.kill('SIGINT');
+            process.exit();
+          }, 10000);
+  
+    } ;
     player_songs.play(`music/${list_music[count_list_songs]}`);
 })

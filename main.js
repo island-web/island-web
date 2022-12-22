@@ -26,7 +26,10 @@ function command(mes) {
       const child_download_songs = fork(`download_songs`);
       child_download_songs.on('message', m => {
         console.log(m);
-        setInterval(function () { process.exit() }, 10000);
+        setInterval(function () { 
+          child.kill('SIGINT');
+          process.exit();
+        }, 10000);
       })
       break;
 
@@ -41,7 +44,10 @@ function command(mes) {
       
       case `INITIALIZATION_FINISH`:
         db.set("initialization", "2");
-        setTimeout(function(){ process.exit() },10000)
+        setTimeout(function(){ 
+          child.kill('SIGINT');
+          process.exit();
+        },10000)
         break;
 
       
@@ -51,6 +57,7 @@ function command(mes) {
         break;
           
     }
+    
 }
 ///////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////
