@@ -11,7 +11,7 @@ let now_time = date.format(new Date(), 'HH:mm:ss');
 //****************************************************************************************************** */
 //****************************************************************************************************** */
 
-//START
+//START 12.6.4
 let data_station = db.get("data_station")[0];
 if (now_time > data_station.start_work && now_time < data_station.stop_work && db.get("initialization") > 2) {
     console.log(`START WORK STATION - ${data_station.name_station}`);

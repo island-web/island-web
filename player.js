@@ -2,7 +2,6 @@ const db = require("croxydb");
 const fs = require('fs');
 const date = require('date-and-time');
 let mpg321 = require('mpg321');
-let errors = 0;
 
 
 function shuffle(arr) {
