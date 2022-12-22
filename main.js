@@ -62,7 +62,6 @@ function command(mes) {
       const child_get_adv = fork(`get_adv`);
       child_get_adv.on('message', message => {
         console.log(message);
-        command('DOWNLOAD_ADV')
       })
 
       break;
