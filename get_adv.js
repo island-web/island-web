@@ -1,6 +1,8 @@
 const day = require('date-and-time');
 const db = require("croxydb")
 const mysql = require('mysql2');
+const host = 'https://infiniti-pro.com/';
+const https = require('node:https');
 
 let connection = mysql.createConnection({
     host: 'infiniti-pro.com',
@@ -16,9 +18,8 @@ let connection_adv = mysql.createConnection({
     password: 'nBAw8R03mKti'
 });
 
-let today = date.format(new Date(), 'YYYY/MM/DD');
+let today = day.format(new Date(), 'YYYY/MM/DD');
 
-console.log('CHECK ADV');
 
     connection.query(`SELECT id_program FROM stations_program WHERE id_station = ${db.get("id")}`,
         function (err, results) {
@@ -28,7 +29,7 @@ console.log('CHECK ADV');
                 }    
             }
             else{
-                let temp_adv = [];
+                db.delete('adv');
                 results.forEach(ad => {
                     connection_adv.query(`SELECT * FROM adv_program WHERE id_program = ${ad.id_program}`,
                         function (err, results_adv) {
@@ -39,16 +40,15 @@ console.log('CHECK ADV');
                             }
                             else{
                                 results_adv.forEach(r_ad => {
-                                    if (r_ad.date_stop > today) { temp_ad.push(r_ad); }
+                                    if (day.format(r_ad.date_stop, 'YYYY/MM/DD') > today) { db.push('adv', r_ad); }
                                 });
-                                if (process.send) {
-                                    process.send('NEW_ADV', results);
-                                    db.set("adv", temp_adv);
-                                }    
                             }
                         });
-                });
-                connection_adv.end();    
+                    });
+                connection_adv.end();
+                if (process.send) {
+                    process.send('CHECK_ADV_FINISH');
+                }      
             }
         });
     connection.end();
