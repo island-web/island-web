@@ -63,5 +63,6 @@ if (db.get("initialization") == 0) {
 } else if (db.get("initialization") == 2) {
   if(process.send){
     process.send('DOWNLOAD_SONGS');
+    process.send('DOWNLOAD_ADV');
   }
 }

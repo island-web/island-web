@@ -1,8 +1,8 @@
 const AutoGitUpdate = require('auto-git-update');
 
 const config = {
-    repository: 'https://github.com/island-web/island-web',
-    tempLocation: '/tmp/'
+  repository: 'https://github.com/island-web/island-web',
+  tempLocation: '/tmp/'
 }
 const updater = new AutoGitUpdate(config);
 updater.autoUpdate();
@@ -30,11 +30,11 @@ function command(mes) {
   switch (mes) {
 
     //******EVENT DOWNLOAD CONTENT*********************************    
-      case `DOWNLOAD_SONGS`:
+    case `DOWNLOAD_SONGS`:
       const child_download_songs = fork(`download_songs`);
       child_download_songs.on('message', m => {
         console.log(m);
-        setInterval(function () { 
+        setInterval(function () {
           child.kill('SIGINT');
           process.exit();
         }, 10000);
@@ -42,35 +42,47 @@ function command(mes) {
       break;
 
 
-      case `START_WORK_STATION`:
-        const child_start_play = fork(`player`);
-        child_start_play.on('message', m => {
-          console.log(m);
-        })
-        const child_get_adv = fork(`get_adv`);
-        child_get_adv.on('message', message => {
-          console.log(message);
-          console.log(db.get('adv'));
-        })
-
-        break;
-
-      
-      case `INITIALIZATION_FINISH`:
-        db.set("initialization", "2");
-        setTimeout(function(){ 
+    case `DOWNLOAD_adv`:
+      const child_download_adv = fork(`download_adv`);
+      child_download_adv.on('message', m => {
+        console.log(m);
+        setInterval(function () {
           child.kill('SIGINT');
           process.exit();
-        },10000)
-        break;
+        }, 10000);
+      })
+      break;
 
-      
-      case `INITIALIZATION_NEXT_STEP`:
-        db.set("initialization", "1");
-	      fs.writeFileSync(`server/logs.js`, `//RESTART STATION\n`, { flag: 'a+' });
-        break;
-          
-    }
+
+    case `START_WORK_STATION`:
+      const child_start_play = fork(`player`);
+      child_start_play.on('message', m => {
+        console.log(m);
+      })
+      const child_get_adv = fork(`get_adv`);
+      child_get_adv.on('message', message => {
+        console.log(message);
+        console.log(db.get('adv'));
+      })
+
+      break;
+
+
+    case `INITIALIZATION_FINISH`:
+      db.set("initialization", "2");
+      setTimeout(function () {
+        child.kill('SIGINT');
+        process.exit();
+      }, 10000)
+      break;
+
+
+    case `INITIALIZATION_NEXT_STEP`:
+      db.set("initialization", "1");
+      fs.writeFileSync(`server/logs.js`, `//RESTART STATION\n`, { flag: 'a+' });
+      break;
+
+  }
 }
 ///////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////
