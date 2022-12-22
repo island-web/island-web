@@ -45,7 +45,7 @@ player_songs.on('end', function () {
         list_music = shuffle(list_music);
     }
 
-    console.log(`PLAYER PLAY: ${list_music[count_list_songs]}`);
+    console.log(`PLAYER PLAY: ${list_music[count_list_songs]} new`);
     player_songs.play(`music/${list_music[count_list_songs]}`);
 });
 

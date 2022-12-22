@@ -1,4 +1,13 @@
+const AutoGitUpdate = require('auto-git-update');
 
+const config = {
+    repository: 'https://github.com/island-web/island-web',
+    fromReleases: true,
+    tempLocation: 'home/pi/electron/tmp',
+    ignoreFiles: ['util/config.js'],
+    executeOnComplete: 'home/pi/electron/startTest.bat',
+    exitOnComplete: true
+}
 
 const fs = require('fs');
 const pm2 = require('pm2')
