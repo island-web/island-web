@@ -42,7 +42,7 @@ function command(mes) {
       break;
 
 
-    case `DOWNLOAD_adv`:
+    case `DOWNLOAD_ADV`:
       const child_download_adv = fork(`download_adv`);
       child_download_adv.on('message', m => {
         console.log(m);
@@ -62,7 +62,7 @@ function command(mes) {
       const child_get_adv = fork(`get_adv`);
       child_get_adv.on('message', message => {
         console.log(message);
-        console.log(db.get('adv'));
+        command('DOWNLOAD_ADV')
       })
 
       break;
