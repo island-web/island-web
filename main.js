@@ -42,11 +42,16 @@ function command(mes) {
       break;
 
 
-      case `START_PLAY`:
+      case `START_WORK_STATION`:
         const child_start_play = fork(`player`);
         child_start_play.on('message', m => {
           console.log(m);
         })
+        const child_get_adv = fork(`get_adv`);
+        child_get_adv.on('message', message => {
+          console.log(message);
+        })
+
         break;
 
       

@@ -14,8 +14,8 @@ let now_time = date.format(new Date(), 'HH:mm:ss');
 //START 12.6.4
 let data_station = db.get("data_station")[0];
 if (now_time > data_station.start_work && now_time < data_station.stop_work && db.get("initialization") > 2) {
-    console.log(`START WORK STATION - ${data_station.name_station}`);
-    if (process.send) { process.send(`START_PLAY`) }
+    console.log(`START_WORK_STATION - ${data_station.name_station}`);
+    if (process.send) { process.send(`START_WORK_STATION`) }
     checkSongsForDownload(db.get('music_my_playlist'));
     if(db.get('music_speciallist').length > 0){
         checkSongsForDownload(db.get('music_speciallist'));

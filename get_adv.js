@@ -34,8 +34,7 @@ function getAdv() {
                                 if (r_ad.date_stop > new Date(today())) { temp_ad.push(r_ad); }
                             });
                             if (process.send) {
-                               
-                                process.send(results);
+                                process.send('NEW_ADV', results);
                                 db.set("adv", temp_adv);
                             }
                         });
