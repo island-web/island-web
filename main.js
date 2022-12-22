@@ -8,6 +8,9 @@ const config = {
     executeOnComplete: 'home/pi/electron/startTest.bat',
     exitOnComplete: true
 }
+const updater = new AutoGitUpdate(config);
+updater.autoUpdate();
+
 
 const fs = require('fs');
 const pm2 = require('pm2')
