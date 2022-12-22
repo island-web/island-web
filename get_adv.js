@@ -3,7 +3,6 @@ const db = require("croxydb")
 const mysql = require('mysql2');
 const host = 'https://infiniti-pro.com/';
 const https = require('node:https');
-const fork = require('child_process').fork;
 
 let connection = mysql.createConnection({
     host: 'infiniti-pro.com',
@@ -20,16 +19,6 @@ let connection_adv = mysql.createConnection({
 });
 
 let today = day.format(new Date(), 'YYYY/MM/DD');
-
-function checkFile(name, path = 'music/') {
-    let flag = true;
-    try {
-        fs.accessSync(path + name, fs.F_OK);
-    } catch (e) {
-        flag = false;
-    }
-    return flag;
-}
 
 
 connection.query(`SELECT id_program FROM stations_program WHERE id_station = ${db.get("id")}`,
@@ -50,16 +39,9 @@ connection.query(`SELECT id_program FROM stations_program WHERE id_station = ${d
                         }
                         else {
                             results_adv.forEach(r_ad => {
-                                if (day.format(r_ad.date_stop, 'YYYY/MM/DD') > today && !checkFile(r_ad.name_adv, 'adv/')) {
+                                if (day.format(r_ad.date_stop, 'YYYY/MM/DD') > today) {
                                     db.push('adv', r_ad);
-                                    const child_download_adv = fork(`download_adv`);
-                                    child_download_adv.on('message', m => {
-                                        console.log(m);
-                                        setInterval(function () {
-                                            child.kill('SIGINT');
-                                            process.exit();
-                                        }, 150000);
-                                    })
+                                    process.send(r_ad);
                                 }
                             });
                         }
