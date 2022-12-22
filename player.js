@@ -38,7 +38,11 @@ player_songs.play(`music/${list_music[count_list_songs]}`);
 
 player_songs.on('end', function () {
     count_list_songs++;
-
+    if(count_list_songs == list_music.length){
+        count_list_songs = 0;
+        list_music = shuffle(list_music);
+    }
+    
 
     if(count_list_songs == list_music.length){
         count_list_songs = 0;
