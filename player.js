@@ -2,6 +2,8 @@ const db = require("croxydb");
 const fs = require('fs');
 const date = require('date-and-time');
 let mpg321 = require('mpg321');
+let errors = 0;
+
 
 function shuffle(arr) {
     var j, temp;
@@ -14,17 +16,16 @@ function shuffle(arr) {
     return arr;
 }
 
-console.log("HELLO I`M PLAYER ;)");
+console.log("HELLO I`M PLAYER");
 
 let list_music = [];
 
-if(db.get("music_my_playlist").length > 0){
     db.get("music_my_playlist").forEach(song => {
-        if (song['artist'] && song['name_song'] != '') {
-            list_music.push(`${song['artist']}-${song['name_song']}.mp3`);
-        }
+            if (song['artist'] && song['name_song'] != '') {
+                list_music.push(`${song['artist']}-${song['name_song']}.mp3`);
+            }    
     });    
-}
+
 list_music = shuffle(list_music);
 
 
@@ -50,5 +51,7 @@ player_songs.on('end', function () {
 
 player_songs.on('error', function(e){
     console.log(`PLAYER PLAY ERROR: ${e}`);
-    fs.writeFileSync(`server/logs.js`, `PLAYER PLAY ERROR: ${e}/n`, { flag: 'a+' });
+    count_list_songs++;
+    if(errors > 10) fs.writeFileSync(`server/logs.js`, `PLAYER PLAY ERROR: ${e}/n`, { flag: 'a+' });
+    player_songs.play(`music/${list_music[count_list_songs]}`);
 })

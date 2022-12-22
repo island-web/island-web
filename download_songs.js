@@ -5,9 +5,17 @@ const https = require('node:https');
 const fs = require('fs');
 //****************************************************************************************************** */
 //****************************************************************************************************** */
-console.log(db.get(`buffer_download`).length);
-let count_songs_download = 0
-let songs = db.get(`buffer_download`);
+let count_songs_download = 0;
+let songs;
+
+if(db.get('initialization') == 2) {
+    songs = [];
+    db.get('music_my_playlist').forEach(element => {
+        songs.push(`${element['artist']}-${element['name_song']}.mp3`);
+    });
+}else{
+    songs = db.get(`buffer_download`);
+}
 
 const download = (url, path, name) => {
     console.log(`START_DOWNLOAD ========== > ${songs[count_songs_download]}`)
@@ -22,7 +30,7 @@ const download = (url, path, name) => {
             if (count_songs_download < songs.length) {
                 download(`${host}/music/${songs[count_songs_download]}`, `music/${songs[count_songs_download]}`)
             }else{
-                db.delete(`buffer_download`);
+                (db.get('initialization') == 2) ? db.set("initialization", "3") : db.delete(`buffer_download`);
                 if (process.send) { process.send(`END_DOWNLOAD_SONGS`) }
             }
         });

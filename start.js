@@ -1,9 +1,11 @@
 const db = require('croxydb');
 const fork = require('child_process').fork;
 const fs = require('fs');
+const https = require('https');
+const host = 'https://infiniti-pro.com/';
 
 //GET FIRST DATA /////////////////////////////////////////////
-if (db.get("initialization") != 1) {
+if (db.get("initialization") == 0) {
   
   const child_data_file = 'data_station';
   const child_data_station = fork(child_data_file);
@@ -58,4 +60,8 @@ if (db.get("initialization") != 1) {
   if(process.send){
     process.send('INITIALIZATION_FINISH');
   }
-} 
+} else if (db.get("initialization") == 2) {
+  if(process.send){
+    process.send('DOWNLOAD_SONGS');
+  }
+}
