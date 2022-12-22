@@ -1,6 +1,6 @@
+const day = require('date-and-time');
 const db = require("croxydb")
 const mysql = require('mysql2');
-
 
 let connection = mysql.createConnection({
     host: 'infiniti-pro.com',
@@ -16,8 +16,10 @@ let connection_adv = mysql.createConnection({
     password: 'nBAw8R03mKti'
 });
 
+let today = date.format(new Date(), 'YYYY/MM/DD');
+
 console.log('CHECK ADV');
-function getAdv() {
+
     connection.query(`SELECT id_program FROM stations_program WHERE id_station = ${db.get("id")}`,
         function (err, results) {
             if(err){
@@ -37,7 +39,7 @@ function getAdv() {
                             }
                             else{
                                 results_adv.forEach(r_ad => {
-                                    if (r_ad.date_stop > new Date(today())) { temp_ad.push(r_ad); }
+                                    if (r_ad.date_stop > today) { temp_ad.push(r_ad); }
                                 });
                                 if (process.send) {
                                     process.send('NEW_ADV', results);
@@ -50,4 +52,3 @@ function getAdv() {
             }
         });
     connection.end();
-}
