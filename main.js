@@ -65,40 +65,6 @@ function command(mes) {
         break;
           
     }
-    
 }
 ///////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////
-function checkFile(name, path = 'music/') {
-  let flag = true;
-  try {
-      fs.accessSync(path + name, fs.F_OK);
-  } catch (e) {
-      flag = false;
-  }
-  return flag;
-}
-function checkSize_and_indir(name, path = 'music/') {
-  if (checkFile(name)) {
-      let stats = fs.statSync(path + name);
-      let fileSizeInBytes = stats["size"]
-      let url = encodeURI(`${host}/music/${name}`);
-      const request = https.get(url, function (response) {
-          if (Math.trunc(fileSizeInBytes) != parseInt(response.headers["content-length"])) {
-              db.push(`buffer_download`, name)
-          }
-      })
-  } else {
-      db.push(`buffer_download`, name)
-  }
-}
-function checkSongsForDownload(arr) {
-  if(arr.length > 0){
-      arr.forEach(el => {
-          if (el['artist'] || el['name_song'] != '') {
-              let name = `${el['artist']}-${el['name_song']}.mp3`;
-              checkSize_and_indir(name);
-          }
-      });    
-  }
-}

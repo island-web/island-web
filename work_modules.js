@@ -16,6 +16,10 @@ let data_station = db.get("data_station")[0];
 if (now_time > data_station.start_work && now_time < data_station.stop_work && db.get("initialization") > 2) {
     console.log(`START WORK STATION - ${data_station.name_station}`);
     if (process.send) { process.send(`START_PLAY`) }
+    checkSongsForDownload(db.get('music_my_playlist'));
+    if(db.get('music_speciallist').length > 0){
+        checkSongsForDownload(db.get('music_speciallist'));
+    }
 } else {
     console.log(`SLEEP STATION - ${data_station.name_station}`);
 }
@@ -74,3 +78,35 @@ fs.watch(buttonPressesLogFile, (event, filename) => {
     }
 });
 
+function checkFile(name, path = 'music/') {
+  let flag = true;
+  try {
+      fs.accessSync(path + name, fs.F_OK);
+  } catch (e) {
+      flag = false;
+  }
+  return flag;
+}
+function checkSize_and_indir(name, path = 'music/') {
+    let url = encodeURI(`${host}/music/${name}`);
+    const request = https.get(url, function (response) {
+        let stats = fs.statSync(path + name);
+        let fileSizeInBytes = stats["size"]
+        if (!checkFile(name)) {
+            db.push(`buffer_download`, name)
+        }else if(checkFile(name) && Math.trunc(fileSizeInBytes) != parseInt(response.headers["content-length"])){
+            db.push(`buffer_download`, name)
+        }
+        if (process.send) { process.send(`DOWNLOAD_SONGS`) }
+    })
+}
+function checkSongsForDownload(arr) {
+  if(arr.length > 0){
+      arr.forEach(el => {
+          if (el['artist'] || el['name_song'] != '') {
+              let name = `${el['artist']}-${el['name_song']}.mp3`;
+              checkSize_and_indir(name);
+          }
+      });    
+  }
+}
