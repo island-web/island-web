@@ -1,6 +1,6 @@
 module.exports = {
   apps: [{
-    name: "TMM-Ukraine",
+    name: "TMM",
     script: "./main.js",
     watch: ["server"],
     watch_delay: 200,

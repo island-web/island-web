@@ -24,6 +24,7 @@ if (db.get("initialization") == 0) {
     console.log(message);
     if(message != 'ERROR CONNECTION TO [DATA PLAYLIST], SERVER DOWN'){console.log(`SAVE ID PROGRAM PLAYLISTS ...`)}
   })
+  
 } else if (db.get("initialization") == 1) {
   //GET PLAYLIST ////////////////////////////////////////////
   const child_get_playlist_file = 'get_playlists';
@@ -61,8 +62,5 @@ if (db.get("initialization") == 0) {
     process.send('INITIALIZATION_FINISH');
   }
 } else if (db.get("initialization") == 2) {
-  if(process.send){
-    process.send('DOWNLOAD_SONGS');
-    process.send('DOWNLOAD_ADV');
-  }
+  if(process.send){ process.send('DOWNLOAD_SONGS'); }
 }

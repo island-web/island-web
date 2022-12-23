@@ -19,29 +19,31 @@ let connection_adv = mysql.createConnection({
 });
 
 let today = day.format(new Date(), 'YYYY/MM/DD');
-
+  
 
 connection.query(`SELECT id_program FROM stations_program WHERE id_station = ${db.get("id")}`,
     function (err, results) {
         if (err) {
             if (process.send) {
-                process.send('ERROR CONNECTION TO [DATA_ADV], SERVER DOWN');
+                process.send('ERROR CONNECTION TO [ DATA_ADV ], SERVER DOWN');
             }
         }
         else {
+            db.delete('adv');
+            console.log('LIST_ACTUAL_ADV:');
             results.forEach(ad => {
                 connection_adv.query(`SELECT * FROM adv_program WHERE id_program = ${ad.id_program}`,
                     function (err, results_adv) {
                         if (err) {
                             if (process.send) {
-                                process.send('ERROR CONNECTION TO [DATA_ADV], SERVER DOWN');
+                                process.send('ERROR CONNECTION TO [ DATA_ADV ], SERVER DOWN');
                             }
                         }
                         else {
                             results_adv.forEach(r_ad => {
-                                if (day.format(r_ad.date_stop, 'YYYY/MM/DD') > today) {
+                                if (day.format(r_ad.date_stop, 'YYYY/MM/DD') >= today) {
                                     db.push('adv', r_ad);
-                                    process.send(r_ad);
+                                    console.log(`${r_ad.name_adv} [${r_ad.time_start} - ${r_ad.time_stop}]`);
                                 }
                             });
                         }
@@ -49,7 +51,7 @@ connection.query(`SELECT id_program FROM stations_program WHERE id_station = ${d
             });
             connection_adv.end();
             if (process.send) {
-                process.send('CHECK_ADV_FINISH');
+                process.send('');
             }
         }
     });

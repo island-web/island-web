@@ -10,7 +10,7 @@ let adv;
 
 if(db.get('initialization') == 2) {
     adv = [];
-    db.get('adm').forEach(element => {
+    db.get('adv').forEach(element => {
         adv.push(`${element['name']}.mp3`);
     });
 }else{
