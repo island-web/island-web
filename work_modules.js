@@ -6,7 +6,7 @@ const mysql = require('mysql2');
 const host = 'https://infiniti-pro.com/';
 const https = require('node:https');
 
-let now_full_date = date.format(new Date(), 'YYYY/MM/DD HH:mm:ss');
+let today = date.format(new Date(), 'HH:mm:ss');
 let now_time = date.format(new Date(), 'HH:mm:ss');
 //****************************************************************************************************** */
 //****************************************************************************************************** */
@@ -104,9 +104,19 @@ function checkAudioForDownload(arr, path) {
             });
         }
     } catch (err) {
-        console("ERROR STRING 108 SEE LOGS");
+        console.log("ERROR STRING 108 SEE LOGS");
     }
 }
 
 //****************************************************************************************************** */
 //****************************************************************************************************** */
+
+//SORT ADV 
+function sortAdv() {
+    db.get('adv').forEach(element => {
+        if (today >= date.format(new Date(), element.date_start) && new today <= new date.format(new Date(), element.date_stop)) {
+            if (element.type == 'fix') { db.push('adv_fixed', element) }
+            else if (element.type == 'interval_t') { db.push('adv_interval', element); }
+        }
+    });
+}

@@ -14,13 +14,14 @@
   "license": "MIT",
   "devDependencies": {
     "electron": "^22.0.0"
-    },
+  },
   "dependencies": {
     "auto-git-update": "^2.1.2",
     "croxydb": "^0.0.7",
     "date-and-time": "^2.4.1",
     "electron-localstorage": "^1.0.5",
     "fs": "^0.0.1-security",
+    "git": "^0.1.5",
     "https": "^1.0.0",
     "md5": "^2.3.0",
     "mpg321": "^0.1.5",
