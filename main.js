@@ -1,12 +1,14 @@
+
 const AutoGitUpdate = require('auto-git-update');
 
-const config = { 
+const config = {
   repository: 'https://github.com/island-web/island-web',
-  fromReleases: true, 
-  tempLocation: '/tmp/'
-} 
-const updater = new AutoGitUpdate(config); 
-updater.autoUpdate(); 
+  fromReleases: true,
+  tempLocation: '/tmp/',
+  ignoreFiles: ['croxydb/croxydb.json', 'adv', 'music', 'tmp']
+}
+const updater = new AutoGitUpdate(config);
+updater.autoUpdate();
 
 
 const fs = require('fs');
@@ -43,8 +45,11 @@ function command(mes) {
     case `DOWNLOAD_ADV`:
       const child_download_adv = fork(`download_adv`);
       child_download_adv.on('message', m => {
-        console.log(m);
-        setTimeout(function () { fs.writeFileSync(`server/logs.js`, `//RESTART STATION\n`, { flag: 'a+' }); }, 10000);
+        //console.log(m);
+        setTimeout(function () {
+          process.exit()
+        },
+          10000)
       })
 
       break;
@@ -66,10 +71,12 @@ function command(mes) {
 
 
     case `INITIALIZATION_FINISH`:
+
       setTimeout(function () {
         db.set("initialization", "2");
-        fs.writeFileSync(`server/logs.js`, `INIT 2`, { flag: 'a+' });
-      }, 10000)
+        process.exit()
+      },
+        10000)
       break;
 
 

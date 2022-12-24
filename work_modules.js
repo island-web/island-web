@@ -4,7 +4,7 @@ const db = require("croxydb");
 const date = require('date-and-time');
 const mysql = require('mysql2');
 const host = 'https://infiniti-pro.com/';
-const https = require('node:https');
+const https = require('https');
 
 let today = date.format(new Date(), 'HH:mm:ss');
 let now_time = date.format(new Date(), 'HH:mm:ss');
@@ -16,8 +16,8 @@ if (now_time > data_station.start_work && now_time < data_station.stop_work && d
     console.log(`START_WORK_STATION - ${data_station.name_station}`);
     if (process.send) {
         checkAudioForDownload(db.get('adv'), 'adv/');
-        checkAudioForDownload(db.get('music_my_playlist'), 'music/');
-        checkAudioForDownload(db.get('music_speciallist'), 'music/');
+        //checkAudioForDownload(db.get('music_my_playlist'), 'music/');
+        //checkAudioForDownload(db.get('music_speciallist'), 'music/');
         process.send(`START_WORK_STATION`);
     }
 } else {

@@ -1,7 +1,13 @@
 const db = require("croxydb");
 const fs = require('fs');
 const date = require('date-and-time');
-let mpg321 = require('mpg321');
+const mpg321 = require('mpg321');
+
+const now = new Date();
+let now_full_day = date.format(now, 'YYYY/MM/DD HH:mm:ss');
+let now_time = date.format(now, 'HH:mm:ss');
+let now_day = date.format(now, 'YYYY/MM/DD');
+
 
 
 function shuffle(arr) {
@@ -31,7 +37,7 @@ list_music = shuffle(list_music);
 let count_list_songs = 0;
 let player_songs = mpg321().remote();
 
-console.log(`PLAYER PLAY: ${list_music[count_list_songs]}`);
+console.log(`[${now_full_day}]:  PLAYER PLAY ======> ${list_music[count_list_songs]}`);
 player_songs.play(`music/${list_music[count_list_songs]}`);
 
 
@@ -48,7 +54,7 @@ player_songs.on('end', function () {
         list_music = shuffle(list_music);
     }
 
-    console.log(`PLAYER PLAY: ${list_music[count_list_songs]} new`);
+    console.log(`[${now_full_day}]:  PLAYER PLAY ======> ${list_music[count_list_songs]}`);
     player_songs.play(`music/${list_music[count_list_songs]}`);
 });
 
