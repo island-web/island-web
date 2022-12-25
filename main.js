@@ -5,7 +5,7 @@ const config = {
   repository: 'https://github.com/island-web/island-web',
   fromReleases: true,
   tempLocation: '/tmp/',
-  ignoreFiles: ['croxydb/croxydb.json', 'adv', 'music']
+  ignoreFiles: ['croxydb/croxydb.json']
 }
 const updater = new AutoGitUpdate(config);
 updater.autoUpdate();
