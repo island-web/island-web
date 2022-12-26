@@ -45,7 +45,7 @@ connection.query(`SELECT id_program FROM stations_program WHERE id_station = ${d
                                 if (day.format(r_ad.date_stop, 'YYYY/MM/DD') >= today) {
                                     db.push('adv', r_ad);
                                     console.log(colors.yellow('************************************************************************'));
-                                    console.log(colors.black(`${r_ad.name_adv} [${r_ad.time_start} - ${r_ad.time_stop}]`));
+                                    console.log(colors.dim(`${r_ad.name_adv} [${r_ad.time_start} - ${r_ad.time_stop}]`));
                                     console.log(colors.yellow('************************************************************************'));
 
                                 }
