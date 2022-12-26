@@ -1,6 +1,6 @@
 {
   "name": "raspberry_electron",
-  "version": "12.10.12",
+  "version": "12.10.13",
   "description": "TMM server",
   "main": "main.js",
   "scripts": {
