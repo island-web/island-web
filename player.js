@@ -46,7 +46,6 @@ function start_interval(list_adv) {
                         clearInterval(end_pause_interval);
                     }
                 }, 500);
-             volume_song = 80;
             }
             else {
                 let temp = buffer_for_wait;
