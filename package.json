@@ -1,6 +1,6 @@
 {
   "name": "raspberry_electron",
-  "version": "12.10.11",
+  "version": "12.10.10",
   "description": "TMM server",
   "main": "main.js",
   "scripts": {
@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "auto-git-update": "^2.1.2",
+    "colors": "^1.4.0",
     "croxydb": "^0.0.7",
     "date-and-time": "^2.4.1",
     "electron-localstorage": "^1.0.5",

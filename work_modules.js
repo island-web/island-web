@@ -5,20 +5,27 @@ const date = require('date-and-time');
 const mysql = require('mysql2');
 const host = 'https://infiniti-pro.com/';
 const https = require('https');
+const send_info_to_server = require('./logs.js');
+const { Console } = require('console');
+let now_full_day = date.format(new Date(), 'YYYY/MM/DD HH:mm:ss');
 
-let today = date.format(new Date(), 'HH:mm:ss');
+let today = date.format(new Date(), 'YYYY/MM/DD');
 let now_time = date.format(new Date(), 'HH:mm:ss');
 //****************************************************************************************************** */
 //****************************************************************************************************** */
-
 let data_station = db.get("data_station")[0];
 if (now_time > data_station.start_work && now_time < data_station.stop_work && db.get("initialization") > 2) {
-    console.log(`START_WORK_STATION - ${data_station.name_station}`);
+
+    send_info_to_server.send_lod(`START_WORK_STATION`, 0, `work`, now_full_day);
+    send_info_to_server.send_status();
+
     if (process.send) {
+        process.send(`START_WORK_STATION`);
         checkAudioForDownload(db.get('adv'), 'adv/');
+        sortAdv();
         //checkAudioForDownload(db.get('music_my_playlist'), 'music/');
         //checkAudioForDownload(db.get('music_speciallist'), 'music/');
-        process.send(`START_WORK_STATION`);
+
     }
 } else {
     console.log(`SLEEP STATION - ${data_station.name_station}`);
@@ -113,10 +120,25 @@ function checkAudioForDownload(arr, path) {
 
 //SORT ADV 
 function sortAdv() {
+db.delete('adv_interval')
     db.get('adv').forEach(element => {
-        if (today >= date.format(new Date(), element.date_start) && new today <= new date.format(new Date(), element.date_stop)) {
+        if (today >= date.format(new Date(element.date_start), 'YYYY/MM/DD') && today <= date.format(new Date(element.date_stop), 'YYYY/MM/DD')) {
             if (element.type == 'fix') { db.push('adv_fixed', element) }
-            else if (element.type == 'interval_t') { db.push('adv_interval', element); }
+            else if (element.type == 'interval_t') {
+                let flag = false;
+                if(db.get('adv_interval')){
+                    db.get('adv_interval').forEach(el => {
+                        if (el[0].interval == element.interval_t) {
+                            el[1].list.push(element);
+                            flag = true;
+                        }
+                    });    
+                }
+                if (!flag) {
+                    db.push('adv_interval',[{ interval: element.interval_t }, { list: [element] }]);
+                }
+            }
         }
     });
+
 }
