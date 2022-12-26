@@ -1,6 +1,6 @@
 {
   "name": "raspberry_electron",
-  "version": "12.10.13",
+  "version": "12.10.16",
   "description": "TMM server",
   "main": "main.js",
   "scripts": {
@@ -24,6 +24,7 @@
     "fs": "^0.0.1-security",
     "git": "^0.1.5",
     "https": "^1.0.0",
+    "kill-process-by-name": "^1.0.5",
     "md5": "^2.3.0",
     "mpg321": "^0.1.5",
     "mysql": "^2.18.1",

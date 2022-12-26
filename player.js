@@ -134,7 +134,8 @@ player_songs.on('error', function (e) {
     send_info_to_server.send_lod(`PLAYER_PLAY_ERROR: =====> ${e}`, 0, 'error', date.format(new Date(), 'YYYY/MM/DD HH:mm:ss'), 'error');
     console.log(`PLAYER_PLAY_ERROR: ${e}`);
     setTimeout(function () {
-        process.exit();
+        killProcess('mpg321');
+        killProcess('node');
     }, 5000)
 })
 

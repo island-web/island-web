@@ -15,6 +15,7 @@ const pm2 = require('pm2')
 const db = require('croxydb');
 const fork = require('child_process').fork;
 const host = 'https://infiniti-pro.com/';
+const killProcess = require('kill-process-by-name');
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
 
@@ -36,7 +37,10 @@ function command(mes) {
       const child_download_songs = fork(`download_songs`);
       child_download_songs.on('message', m => {
         console.log(m);
-        setTimeout(function () { process.exit() }, 10000)
+        setTimeout(function () { 
+          killProcess('mpg321');
+          killProcess('node');
+        }, 10000)
       })
       break;
 
@@ -46,7 +50,8 @@ function command(mes) {
       child_download_adv.on('message', m => {
         //console.log(m);
         setTimeout(function () {
-          process.exit()
+          killProcess('mpg321');
+          killProcess('node');
         },
           10000)
       })
