@@ -2,7 +2,7 @@ const db = require("croxydb");
 const fork = require('child_process').fork;
 const date = require('date-and-time');
 
-
+//test
 let int = db.get('adv_interval');
 
     int.forEach(obj => {
