@@ -30,7 +30,7 @@ const download_adv = (url, path) => {
             if (count_adv_download < adv.length) {
                 download_adv(`${host}/adv/${adv[count_adv_download]}`, `adv/${adv[count_adv_download]}`)
             }else{
-                (db.get('initialization') == 2) ? db.set("initialization", "3") : db.delete(`buffer_download_adv`);
+                if(db.get('initialization') == 2) ? db.set("initialization", "3") : db.delete(`buffer_download_adv`);
                 if (process.send) { process.send(`END_DOWNLOAD_ADV`) }
             }
         });
