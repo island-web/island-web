@@ -4,7 +4,7 @@ const db = require("croxydb");
 
 
 shell.rm('-rf', '/home/pi/Desktop/TMM_RASPBERRY/tmm.zip');
-shell.rm('-rf', '/home/pi/Desktop/TMM_RASPBERRY/island-web');
+
 
 shell.exec('npm node monit_start.js');
 
