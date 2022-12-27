@@ -32,7 +32,12 @@ const download = (url, path, name) => {
             if (count_songs_download < songs.length) {
                 download(`${host}/music/${songs[count_songs_download]}`, `music/${songs[count_songs_download]}`)
             }else{
-                (db.get('initialization') == 2){ db.set("initialization", "3", shell.exec('reboot')) }else{ db.delete(`buffer_download`)}
+                if(db.get('initialization') == 2) { 
+                    db.set("initialization", "3"); 
+                    shell.exec('reboot')
+                }else{ 
+                    db.delete(`buffer_download`)
+                }
                 if (process.send) { process.send(`END_DOWNLOAD_SONGS`) }
             }
         });
