@@ -16,6 +16,7 @@ const db = require('croxydb');
 const fork = require('child_process').fork;
 const host = 'https://infiniti-pro.com/';
 const killProcess = require('kill-process-by-name');
+
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
 
@@ -48,7 +49,6 @@ function command(mes) {
     case `DOWNLOAD_ADV`:
       const child_download_adv = fork(`download_adv`);
       child_download_adv.on('message', m => {
-        //console.log(m);
         setTimeout(function () {
           killProcess('mpg321');
           killProcess('node');

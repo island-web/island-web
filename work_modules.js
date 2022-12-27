@@ -6,8 +6,10 @@ const mysql = require('mysql2');
 const host = 'https://infiniti-pro.com/';
 const https = require('https');
 const send_info_to_server = require('./logs.js');
+const make = require('./func.js');
 const { Console } = require('console');
 let now_full_day = date.format(new Date(), 'YYYY/MM/DD HH:mm:ss');
+
 
 let today = date.format(new Date(), 'YYYY/MM/DD');
 let now_time = date.format(new Date(), 'HH:mm:ss');
@@ -15,14 +17,15 @@ let now_time = date.format(new Date(), 'HH:mm:ss');
 //****************************************************************************************************** */
 let data_station = db.get("data_station")[0];
 if (now_time > data_station.start_work && now_time < data_station.stop_work && db.get("initialization") > 2) {
-
-    send_info_to_server.send_lod(`START_WORK_STATION`, 0, `work`, now_full_day);
+    make.get_new_data();
+    sortAdv();
+    send_info_to_server.send_log(`START_WORK_STATION`, 0, `work`, now_full_day);
     send_info_to_server.send_status();
 
     if (process.send) {
-        process.send(`START_WORK_STATION`);
         checkAudioForDownload(db.get('adv'), 'adv/');
-        sortAdv();
+        process.send(`START_WORK_STATION`);
+        
         //checkAudioForDownload(db.get('music_my_playlist'), 'music/');
         //checkAudioForDownload(db.get('music_speciallist'), 'music/');
 
@@ -110,6 +113,7 @@ function checkAudioForDownload(arr, path) {
                 checkSize_and_indir(name, path);
             });
         }
+        
     } catch (err) {
         console.log("ERROR STRING 108 SEE LOGS");
     }
@@ -117,13 +121,14 @@ function checkAudioForDownload(arr, path) {
 
 //****************************************************************************************************** */
 //****************************************************************************************************** */
-
-//SORT ADV 
 function sortAdv() {
-db.delete('adv_interval')
+    db.delete('adv_interval')
+    db.delete('adv_fixed')
     db.get('adv').forEach(element => {
         if (today >= date.format(new Date(element.date_start), 'YYYY/MM/DD') && today <= date.format(new Date(element.date_stop), 'YYYY/MM/DD')) {
-            if (element.type == 'fix') { db.push('adv_fixed', element) }
+            if (element.type == 'fix') { 
+                db.push('adv_fixed', element); 
+            }
             else if (element.type == 'interval_t') {
                 let flag = false;
                 if(db.get('adv_interval')){
@@ -141,4 +146,5 @@ db.delete('adv_interval')
         }
     });
 }
+
 //test

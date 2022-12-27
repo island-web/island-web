@@ -4,8 +4,6 @@ const https = require('https');
 const db = require("croxydb");
 const colors = require('colors');
 const date = require('date-and-time');
-
-
 let station = db.get('data_station');
 
 
@@ -16,7 +14,7 @@ let connection_online = mysql.createConnection({
     password: 'fpCB4MZ5'
 });
 
-module.exports.send_lod = function (message, id_song, status, current_time, type = null) {
+module.exports.send_log = function (message, id_song, status, current_time, type = null) {
     let connection = mysql.createConnection({
         host: 'infiniti-pro.com',
         user: 'u_logs_for_sr',

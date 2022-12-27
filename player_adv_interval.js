@@ -16,5 +16,5 @@ let int = db.get('adv_interval');
         });
         setInterval(function(){
             process.send([play_list, all_duration]);
-        }, (obj[0].interval * 60000) + (all_duration * 1000))
+        },  ( obj[0].interval * 60000) + (all_duration * 1000))
     });

@@ -6,10 +6,15 @@ const send_info_to_server = require('./logs.js');
 const fork = require('child_process').fork;
 const colors = require('colors');
 let now = date.format(new Date(), 'YYYY/MM/DD HH:mm:ss');
+const killProcess = require('kill-process-by-name');
+const child_interval = fork('player_adv_interval');
+const child_fixed = fork('player_fixed');
+
 //let now_full_day = date.format(new Date(), 'YYYY/MM/DD HH:mm:ss');
-let volume_song = 80;
+let volume_song = 70;
 let flag_play_adv = false;
 let buffer_for_wait = [];
+
 
 ///PLAYERS///////////////////////////////////////////////////////////////////
 /**FOR_SONG */
@@ -28,7 +33,7 @@ function start_interval(list_adv) {
     list_adv = list_adv[0];
     let count = 0;
 
-    send_info_to_server.send_lod(`START_PLAY_INTERVAL_ADV ===> ${list_adv[count]}`, 0, 'play', now, 'adv');
+    send_info_to_server.send_log(`START_PLAY_INTERVAL_ADV ===> ${list_adv[count]}`, 0, 'play', now, 'adv');
     player_interval.play(`adv/${list_adv[count]}`);
     player_interval.on('end', function () {
         count++;
@@ -36,16 +41,10 @@ function start_interval(list_adv) {
             if (buffer_for_wait.length == 0) {
 
                 flag_play_adv = false;
-                player_songs.pause();
+                volume_song = 70;
                 player_songs.gain(volume_song);
+                player_songs.pause();
 
-                let end_pause_interval = setInterval(function () {
-                    volume_song += 5;
-                    player_songs.gain(volume_song);
-                    if (volume_song == 80) {
-                        clearInterval(end_pause_interval);
-                    }
-                }, 500);
             }
             else {
                 let temp = buffer_for_wait;
@@ -53,7 +52,7 @@ function start_interval(list_adv) {
                 buffer_for_wait = [];
             }
         } else if (count < list_adv.length) {
-            send_info_to_server.send_lod(`START_PLAY_INTERVAL_ADV ===> ${list_adv[count]}`, 0, 'play', now, 'adv');
+            send_info_to_server.send_log(`START_PLAY_INTERVAL_ADV ===> ${list_adv[count]}`, 0, 'play', now, 'adv');
             player_interval.play(`adv/${list_adv[count]}`);
         }
     })
@@ -63,16 +62,20 @@ function start_interval(list_adv) {
 
 ///CHECK_TIME_FIX_ADV//////////////////////////////////////////////////////
 function check_time_fix_adv(all_duration) {
-    console.log(db.get('adv_fixed'));
+    let f = true;
+    let start_interval = new Date();
+    let end_interval = new Date(start_interval.getTime() + all_duration * 1000);
 
-/*     if (fixed.length == 0){
-        return false;
-    }else{
-        fixed.forEach(element => {
-            console.log(element.fix);
+    if(db.get('adv_fixed')){
+        db.get('adv_fixed').forEach(obj => {
+            if(date.format(start_interval, 'HH:mm:ss') <= obj.fix && date.format(end_interval, 'HH:mm:ss') >= obj.fix){
+                f = false;
+                console.log(f);
+            }
         });    
     }
- */}
+    return f;
+}
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
@@ -90,7 +93,6 @@ function shuffle(arr) {
 }
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
-
 console.log("HELLO I`M PLAYER");
 
 let list_music = [];
@@ -108,7 +110,7 @@ list_music = shuffle(list_music);
 
 
 
-send_info_to_server.send_lod(`START_PLAY_SONG ===> ${list_music[count_list_songs]} `, 0, 'play', date.format(new Date(), 'YYYY/MM/DD HH:mm:ss'));
+send_info_to_server.send_log(`START_PLAY_SONG ===> ${list_music[count_list_songs]} `, 0, 'play', date.format(new Date(), 'YYYY/MM/DD HH:mm:ss'));
 player_songs.play(`music/${list_music[count_list_songs]}`);
 
 
@@ -125,12 +127,12 @@ player_songs.on('end', function () {
         list_music = shuffle(list_music);
     }
 
-    send_info_to_server.send_lod(`START_PLAY_SONG ===>  ${list_music[count_list_songs]} `, 0, 'play', date.format(new Date(), 'YYYY/MM/DD HH:mm:ss'));
+    send_info_to_server.send_log(`START_PLAY_SONG ===>  ${list_music[count_list_songs]} `, 0, 'play', date.format(new Date(), 'YYYY/MM/DD HH:mm:ss'));
     player_songs.play(`music/${list_music[count_list_songs]}`);
 });
 
 player_songs.on('error', function (e) {
-    send_info_to_server.send_lod(`PLAYER_PLAY_ERROR: =====> ${e}`, 0, 'error', date.format(new Date(), 'YYYY/MM/DD HH:mm:ss'), 'error');
+    send_info_to_server.send_log(`PLAYER_PLAY_ERROR: =====> ${e}`, 0, 'error', date.format(new Date(), 'YYYY/MM/DD HH:mm:ss'), 'error');
     console.log(`PLAYER_PLAY_ERROR: ${e}`);
     setTimeout(function () {
         killProcess('mpg321');
@@ -138,9 +140,9 @@ player_songs.on('error', function (e) {
     }, 5000)
 })
 
-const child_interval = fork('player_adv_interval');
+
 child_interval.on('message', message => {
-    if (flag_play_adv) {
+    if (flag_play_adv || !check_time_fix_adv(message[1])) {
         buffer_for_wait = buffer_for_wait.concat(message);
     } else {
         flag_play_adv = true;
@@ -154,4 +156,34 @@ child_interval.on('message', message => {
             }
         }, 500);
     }
+})
+
+child_fixed.on('message', message => {
+    flag_play_adv = true;
+    
+    let pause_interval = setInterval(function () {
+        volume_song -= 5;
+        player_songs.gain(volume_song);
+        if (volume_song == 0) {
+            player_songs.pause();
+            player_fixed.gain(message.volume);
+            player_fixed.play(`adv/${message.name_adv}`);
+            send_info_to_server.send_log(`START_PLAY_FIXED_ADV ===> ${message.name_adv}`, 0, 'play', now, 'adv');        
+            clearInterval(pause_interval);
+        }
+    }, 500);
+
+    player_fixed.on('end',function(){
+        if(buffer_for_wait.length == 0){
+            flag_play_adv = false;
+            volume_song = 70;
+            player_songs.gain(volume_song);
+            player_songs.pause();    
+        }else{
+            let temp = buffer_for_wait;
+            start_interval(temp);
+            buffer_for_wait = [];
+        }        
+    })
+    
 })
