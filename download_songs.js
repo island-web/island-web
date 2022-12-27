@@ -3,6 +3,8 @@ const db = require('croxydb');
 const host = 'https://infiniti-pro.com/';
 const https = require('node:https');
 const fs = require('fs');
+const shell = require('shelljs');
+
 //****************************************************************************************************** */
 //****************************************************************************************************** */
 let count_songs_download = 0;
@@ -30,7 +32,7 @@ const download = (url, path, name) => {
             if (count_songs_download < songs.length) {
                 download(`${host}/music/${songs[count_songs_download]}`, `music/${songs[count_songs_download]}`)
             }else{
-                (db.get('initialization') == 2) ? db.set("initialization", "3") : db.delete(`buffer_download`);
+                (db.get('initialization') == 2){ db.set("initialization", "3", shell.exec('reboot')) }else{ db.delete(`buffer_download`)}
                 if (process.send) { process.send(`END_DOWNLOAD_SONGS`) }
             }
         });
