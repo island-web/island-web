@@ -33,6 +33,7 @@ function start_interval(list_adv) {
     list_adv = list_adv[0];
     let count = 0;
 
+    send_info_to_server.send_status();
     send_info_to_server.send_log(`START_PLAY_INTERVAL_ADV ===> ${list_adv[count]}`, 0, 'play', now, 'adv');
     player_interval.play(`adv/${list_adv[count]}`);
     player_interval.on('end', function () {
@@ -52,6 +53,7 @@ function start_interval(list_adv) {
                 buffer_for_wait = [];
             }
         } else if (count < list_adv.length) {
+            send_info_to_server.send_status();
             send_info_to_server.send_log(`START_PLAY_INTERVAL_ADV ===> ${list_adv[count]}`, 0, 'play', now, 'adv');
             player_interval.play(`adv/${list_adv[count]}`);
         }
@@ -109,7 +111,7 @@ list_music = shuffle(list_music);
 
 
 
-
+send_info_to_server.send_status();
 send_info_to_server.send_log(`START_PLAY_SONG ===> ${list_music[count_list_songs]} `, 0, 'play', date.format(new Date(), 'YYYY/MM/DD HH:mm:ss'));
 player_songs.play(`music/${list_music[count_list_songs]}`);
 
@@ -127,12 +129,15 @@ player_songs.on('end', function () {
         list_music = shuffle(list_music);
     }
 
+    
+    send_info_to_server.send_status();
     send_info_to_server.send_log(`START_PLAY_SONG ===>  ${list_music[count_list_songs]} `, 0, 'play', date.format(new Date(), 'YYYY/MM/DD HH:mm:ss'));
     player_songs.play(`music/${list_music[count_list_songs]}`);
 });
 
 player_songs.on('error', function (e) {
     send_info_to_server.send_log(`PLAYER_PLAY_ERROR: =====> ${e}`, 0, 'error', date.format(new Date(), 'YYYY/MM/DD HH:mm:ss'), 'error');
+    send_info_to_server.send_status();
     console.log(`PLAYER_PLAY_ERROR: ${e}`);
     setTimeout(function () {
         killProcess('mpg321');
@@ -169,6 +174,7 @@ child_fixed.on('message', message => {
             player_fixed.gain(message.volume);
             player_fixed.play(`adv/${message.name_adv}`);
             send_info_to_server.send_log(`START_PLAY_FIXED_ADV ===> ${message.name_adv}`, 0, 'play', now, 'adv');        
+            send_info_to_server.send_status();
             clearInterval(pause_interval);
         }
     }, 500);

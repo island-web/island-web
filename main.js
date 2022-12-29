@@ -11,7 +11,8 @@ updater.autoUpdate();
 
 
 const fs = require('fs');
-const pm2 = require('pm2')
+const pm2 = require('pm2');
+const shell = require('shelljs');
 const db = require('croxydb');
 const fork = require('child_process').fork;
 const host = 'https://infiniti-pro.com/';

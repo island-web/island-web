@@ -6,14 +6,6 @@ const colors = require('colors');
 const date = require('date-and-time');
 let station = db.get('data_station');
 
-
-let connection_online = mysql.createConnection({
-    host: 'infiniti-pro.com',
-    user: 'u_stations_lj',
-    database: 'stations_list_infiniti',
-    password: 'fpCB4MZ5'
-});
-
 module.exports.send_log = function (message, id_song, status, current_time, type = null) {
     let connection = mysql.createConnection({
         host: 'infiniti-pro.com',
@@ -32,8 +24,18 @@ module.exports.send_log = function (message, id_song, status, current_time, type
 }
 
 module.exports.send_status = function () {
+    let connection_online = mysql.createConnection({
+        host: 'infiniti-pro.com',
+        user: 'u_stations_lj',
+        database: 'stations_list_infiniti',
+        password: 'fpCB4MZ5'
+    });
+    
     connection_online.query(`UPDATE station set online_time=CURRENT_TIME() WHERE id_station=${station[0].id_station}`,
-        function (err) { if(err) console.log(` ERROR_CONNECT_DB_LOGS_STR_30 ========> ${err}`) })
+        function (err) { 
+            if(err) console.log(` ERROR_CONNECT_DB_LOGS_STR_30 ========> ${err}`);
+
+        })
     connection_online.query(`UPDATE station set online_date=CURRENT_DATE() WHERE id_station=${station[0].id_station}`,
         function (err) { if(err) console.log(` ERROR_CONNECT_DB_LOGS_STR_32 ========> ${err}`) })
     connection_online.end();

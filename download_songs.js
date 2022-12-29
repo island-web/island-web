@@ -34,9 +34,9 @@ const download = (url, path, name) => {
             }else{
                 if(db.get('initialization') == 2) { 
                     db.set("initialization", "3"); 
-                    shell.exec('reboot')
+                    shell.exec('sudo reboot');
                 }else{ 
-                    db.delete(`buffer_download`)
+                    db.delete(`buffer_download`);
                 }
                 if (process.send) { process.send(`END_DOWNLOAD_SONGS`) }
             }

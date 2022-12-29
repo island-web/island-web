@@ -18,23 +18,25 @@ let now_time = date.format(new Date(), 'HH:mm:ss');
 let data_station = db.get("data_station")[0];
 if (now_time > data_station.start_work && now_time < data_station.stop_work && db.get("initialization") > 2) {
     make.get_new_data();
+    make.delete_old_adv();
     sortAdv();
     send_info_to_server.send_log(`START_WORK_STATION`, 0, `work`, now_full_day);
-    send_info_to_server.send_status();
-
+    
     if (process.send) {
         checkAudioForDownload(db.get('adv'), 'adv/');
         process.send(`START_WORK_STATION`);
-        
-        //checkAudioForDownload(db.get('music_my_playlist'), 'music/');
-        //checkAudioForDownload(db.get('music_speciallist'), 'music/');
-
     }
 } else {
     console.log(`SLEEP STATION - ${data_station.name_station}`);
 }
 //****************************************************************************************************** */
 //****************************************************************************************************** */
+
+ever = setInterval(function(){
+    make.get_new_data();
+    send_info_to_server.send_status();
+    sortAdv();
+}, 60000)
 
 //CHECK TIME START AND STOP WORK************************************************************************ */
 setInterval(function () {

@@ -7,10 +7,10 @@ const date = require('date-and-time');
 let station = db.get('data_station');
 const killProcess = require('kill-process-by-name');
 const send_info_to_server = require('./logs.js');
+const fork = require('child_process').fork;
 
-
-module.exports.delete_old_adv = function(){
-    if(db.get('adv')){
+module.exports.delete_old_adv = function () {
+    if (db.get('adv')) {
         fs.readdir(`adv/`, (err, files) => {
             files.forEach(file => {
                 let flag = 0;
@@ -25,16 +25,16 @@ module.exports.delete_old_adv = function(){
                 }
             });
             if (err) {
-                let time_out = setTimeout(function () {
-                    shell.exec(`${path_config}restart.sh`);
-                    process.exit();
-                }, 3000);
+                setTimeout(function () {
+                    killProcess('mpg321');
+                    killProcess('node');
+                }, 10000)
             }
-        });    
+        });
     }
 }
 
-module.exports.get_new_data = function(){
+module.exports.get_new_data = function () {
     const connection_station_data = mysql.createConnection({
         host: 'infiniti-pro.com',
         user: 'u_stations_lj',
@@ -43,24 +43,44 @@ module.exports.get_new_data = function(){
     })
 
     const COLLUMS = [
-        'update_playlist',                                                                                                               
-        'update_adv',                                                                                                                    
-        'updata_settings',                                                                                                               
-        'updata_additional',                                                                                                             
-        'updata_soft'
+        'update_playlist',
+        'update_adv',
+        'updata_additional'
     ]
 
     connection_station_data.query(`SELECT * FROM station WHERE id_station=${db.get("id")}`,
         function (err, results) {
-            if(err){
-                send_info_to_server.send_log(`CONNECT_DATADASE_ERROR: =====> ${e}`, 0, 'error', date.format(new Date(), 'YYYY/MM/DD HH:mm:ss'), 'error');
+            
+            if (err) {
+                send_info_to_server.send_log(`CONNECT_DATABASE_ERROR: =====> `, 0, 'error', date.format(new Date(), 'YYYY/MM/DD HH:mm:ss'), 'error');
             }
-            COLLUMS.forEach(element => {
-                 if(results[0][element] == 1){
-                     send_info_to_server.send_log(`NEW_DATA_FROM_SERVER [ ${element} ]`, 0, 'work', date.format(new Date(), 'YYYY/MM/DD HH:mm:ss'), 'adv');
-                 }
-             });
-                
+            if(results){
+                let f = false;
+                db.set('data_station', results);
+                COLLUMS.forEach(element => {
+                    if (results[0][element] == 1) {
+                        f = true;
+                        send_info_to_server.send_log(`NEW_DATA_FROM_SERVER [ ${element} ]`, 0, 'work', date.format(new Date(), 'YYYY/MM/DD HH:mm:ss'), 'adv');
+                        reset(element, db.get("id"));
+                    }
+                })
+                if(f) {
+                    setTimeout(function () {
+                        fs.writeFileSync(`server/logs.js`, `//RESTART STATION`, { flag: 'a' });
+                    },10000)}
+            }
         });
-    connection_station_data.end();    
+    connection_station_data.end();
 }
+
+function reset(col, id_station, val = 0) {
+    let connection_reset = mysql.createConnection({
+        host: 'infiniti-pro.com',
+        user: 'u_stations_lj',
+        database: 'stations_list_infiniti',
+        password: 'fpCB4MZ5'
+    });
+    connection_reset.query(`UPDATE station set ${col} = ${val} WHERE id_station=${id_station}`,function (err) {});
+
+}
+
