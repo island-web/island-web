@@ -37,7 +37,7 @@ module.exports.get_new_data = function () {
     })
 
 
-    const COLLUMS = ['update_playlist', 'update_adv', 'updata_additional'];
+    const COLLUMS = ['update_playlist', 'update_adv', 'updata_additional', 'updata_settings'];
 
     connection_station_data.query(`SELECT * FROM station WHERE id_station=${db.get("id")}`,
         function (err, results) {
