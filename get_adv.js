@@ -2,7 +2,7 @@ const day = require('date-and-time');
 const db = require("croxydb")
 const mysql = require('mysql2');
 const host = 'https://infiniti-pro.com/';
-const https = require('node:https');
+const https = require('https');
 const colors = require('colors');
 
 let connection = mysql.createConnection({

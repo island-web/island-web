@@ -31,7 +31,7 @@ module.exports.send_status = function () {
         password: 'fpCB4MZ5'
     });
     
-    connection_online.query(`UPDATE station set online_time=CURRENT_TIME(), version='13.10.3' WHERE id_station=${station[0].id_station}`,
+    connection_online.query(`UPDATE station set online_time=CURRENT_TIME(), version='13.10.6' WHERE id_station=${station[0].id_station}`,
         function (err) { 
             if(err) console.log(` ERROR_CONNECT_DB_LOGS_STR_30 ========> ${err}`);
 
