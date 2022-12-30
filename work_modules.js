@@ -13,30 +13,35 @@ let now_full_day = date.format(new Date(), 'YYYY/MM/DD HH:mm:ss');
 
 let today = date.format(new Date(), 'YYYY/MM/DD');
 let now_time = date.format(new Date(), 'HH:mm:ss');
+
+sortAdv();
+make.delete_old_adv();
+make.get_new_data();
 //****************************************************************************************************** */
 //****************************************************************************************************** */
 let data_station = db.get("data_station")[0];
 if (now_time > data_station.start_work && now_time < data_station.stop_work && db.get("initialization") > 2) {
-    make.get_new_data();
-    make.delete_old_adv();
-    sortAdv();
+
+    setInterval(() => { 
+
+        if(db.get('update_playlist') == 2) process.send('UPDATE_SONGS'); 
+        checkAudioForDownload(db.get('adv'), 'adv/'); 
+        checkAudioForDownload(db.get('music_my_playlist'), 'music/'); 
+        send_info_to_server.send_status(); 
+        sortAdv(); 
+        make.get_new_data();
+
+    }, 60000);
+
     send_info_to_server.send_log(`START_WORK_STATION`, 0, `work`, now_full_day);
     
-    if (process.send) {
-        checkAudioForDownload(db.get('adv'), 'adv/');
-        process.send(`START_WORK_STATION`);
-    }
+    if (process.send) process.send(`START_WORK_STATION`);
+
 } else {
     console.log(`SLEEP STATION - ${data_station.name_station}`);
 }
 //****************************************************************************************************** */
 //****************************************************************************************************** */
-
-ever = setInterval(function(){
-    make.get_new_data();
-    send_info_to_server.send_status();
-    sortAdv();
-}, 60000)
 
 //CHECK TIME START AND STOP WORK************************************************************************ */
 setInterval(function () {
@@ -67,7 +72,7 @@ fs.watch(buttonPressesLogFile, (event, filename) => {
 //********************************************************** */
 
 //DOWNLOAD SONGS AFTER START STATION
-function checkFile(name, path = 'music/') {
+function checkFile(name, path) {
     let flag = true;
     try {
         fs.accessSync(path + name, fs.F_OK);
@@ -76,77 +81,54 @@ function checkFile(name, path = 'music/') {
     }
     return flag;
 }
-function checkSize_and_indir(name, path = 'music/') {
-    let buff = 'buffer_download';
-    let funk = 'DOWNLOAD_SONGS';
-    if (path == 'adv/') {
-        buff = 'buffer_download_adv';
-        funk = 'DOWNLOAD_ADV';
-    }
-    let url = encodeURI(`${host}${path}${name}`);
-    const request = https.get(url, function (response) {
-        if (!checkFile(name, path)) {
-            db.push(buff, name)
-        } else {
-            let stats = fs.statSync(path + name);
-            let fileSizeInBytes = stats["size"];
-            if (Math.trunc(fileSizeInBytes) != parseInt(response.headers["content-length"])) {
-                console.log(parseInt(response.headers["content-length"]));
-                console.log(Math.trunc(fileSizeInBytes));
-                db.push(buff, name)
-            }
-        }
-        if (db.get(buff)) {
-            if (process.send) { process.send(funk) }
-        }
-    })
-}
+
 function checkAudioForDownload(arr, path) {
-    try {
-        if (arr.length > 0) {
-            let name;
-            arr.forEach(el => {
-                if (path == 'adv/') {
-                    name = el.name_adv;
-                }
-                else if (path == 'music/' && el['artist'] || el['name_song'] != '') {
-                    name = `${el['artist']}-${el['name_song']}.mp3`;
-                }
-                checkSize_and_indir(name, path);
-            });
-        }
-        
-    } catch (err) {
-        console.log("ERROR STRING 108 SEE LOGS");
+
+    if (arr.length > 0) {
+        let buff;
+        let func;
+        let name;
+        arr.forEach(el => {
+            if (path == 'adv/'){ name = el.name_adv; buff = 'buffer_download_adv'; func = 'DOWNLOAD_ADV'; }
+            else { name = `${el['artist']}-${el['name_song']}.mp3`; buff = 'buffer_download'; func = 'DOWNLOAD_SONGS'; }
+
+            if(!checkFile(name, path)) db.push(buff, name);
+        });
+
+        if (db.get(buff)) { console.log(func); process.send(func) }
     }
 }
 
 //****************************************************************************************************** */
 //****************************************************************************************************** */
 function sortAdv() {
-    db.delete('adv_interval')
-    db.delete('adv_fixed')
-    db.get('adv').forEach(element => {
-        if (today >= date.format(new Date(element.date_start), 'YYYY/MM/DD') && today <= date.format(new Date(element.date_stop), 'YYYY/MM/DD')) {
-            if (element.type == 'fix') { 
-                db.push('adv_fixed', element); 
-            }
-            else if (element.type == 'interval_t') {
-                let flag = false;
-                if(db.get('adv_interval')){
-                    db.get('adv_interval').forEach(el => {
-                        if (el[0].interval == element.interval_t) {
-                            el[1].list.push(element);
-                            flag = true;
-                        }
-                    });    
+    if(db.get('adv')){
+
+        db.delete('adv_interval')
+        db.delete('adv_fixed')
+    
+        db.get('adv').forEach(element => {
+            if (today >= date.format(new Date(element.date_start), 'YYYY/MM/DD') && today <= date.format(new Date(element.date_stop), 'YYYY/MM/DD')) {
+                if (element.type == 'fix') { 
+                    db.push('adv_fixed', element); 
                 }
-                if (!flag) {
-                    db.push('adv_interval',[{ interval: element.interval_t }, { list: [element] }]);
+                else if (element.type == 'interval_t') {
+                    let flag = false;
+                    if(db.get('adv_interval')){
+                        db.get('adv_interval').forEach(el => {
+                            if (el[0].interval == element.interval_t) {
+                                el[1].list.push(element);
+                                flag = true;
+                            }
+                        });    
+                    }
+                    if (!flag) {
+                        db.push('adv_interval',[{ interval: element.interval_t }, { list: [element] }]);
+                    }
                 }
             }
-        }
-    });
+        });
+    
+    }
 }
 
-//test

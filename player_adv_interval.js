@@ -5,6 +5,7 @@ const date = require('date-and-time');
 //test
 let int = db.get('adv_interval');
 
+if(int){
     int.forEach(obj => {
         let all_duration = 0;
         let play_list = [];
@@ -18,3 +19,4 @@ let int = db.get('adv_interval');
             process.send([play_list, all_duration]);
         },  ( obj[0].interval * 60000) + (all_duration * 1000))
     });
+}

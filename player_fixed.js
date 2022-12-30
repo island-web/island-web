@@ -3,7 +3,7 @@ const fork = require('child_process').fork;
 const date = require('date-and-time');
 let play_now;
 
-if(db.get('adv_fixed')){
+if( db.get('adv_fixed') != undefined ){
     setInterval(() => {
 
         db.get('adv_fixed').forEach(obj => {
@@ -12,6 +12,7 @@ if(db.get('adv_fixed')){
                 play_now = obj.id_string;
                 process.send(obj);
             }
+            
         });
 
     }, 1000);

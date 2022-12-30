@@ -5,6 +5,5 @@ module.exports = {
     watch: ["server"],
     watch_delay: 10,
     ignore_watch: ["node_modules", "music", "adv", "croxydb"]
-  }
-  ]
+  }]
 }

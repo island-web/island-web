@@ -41,23 +41,33 @@ function command(mes) {
         console.log(m);
         setTimeout(function () { 
           killProcess('mpg321');
-          killProcess('node');
+          fs.writeFileSync(`server/logs.js`, `//RESTART STATION\n`, { flag: 'a+' });
         }, 10000)
       })
-      break;
+    break;  
 
+    case `UPDATE_SONGS`:
+      const child_update_songs = fork(`get_songs_playlist`);
+      const child_update_songs_sp = fork(`get_songs_speciallist`);
+      child_update_songs.on('message', mpl => { 
+        child_update_songs_sp.on('message', mspl => { 
+          console.log(mspl); 
+          setTimeout(function () { killProcess('mpg321'); fs.writeFileSync(`server/logs.js`, `//RESTART STATION\n`, { flag: 'a' }); }, 10000);
+        })  
+      })
+    break;  
 
     case `DOWNLOAD_ADV`:
       const child_download_adv = fork(`download_adv`);
       child_download_adv.on('message', m => {
+        console.log(m);
         setTimeout(function () {
           killProcess('mpg321');
-          killProcess('node');
+          fs.writeFileSync(`server/logs.js`, `//RESTART STATION\n`, { flag: 'a+' });
         },
           10000)
       })
-
-      break;
+    break;
 
 
     case `START_WORK_STATION`:

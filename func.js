@@ -24,12 +24,6 @@ module.exports.delete_old_adv = function () {
                     send_info_to_server.send_log(`DELETE_OLD_ADV - ${file}`, 0, `song`);
                 }
             });
-            if (err) {
-                setTimeout(function () {
-                    killProcess('mpg321');
-                    killProcess('node');
-                }, 10000)
-            }
         });
     }
 }
@@ -42,11 +36,8 @@ module.exports.get_new_data = function () {
         password: 'fpCB4MZ5'
     })
 
-    const COLLUMS = [
-        'update_playlist',
-        'update_adv',
-        'updata_additional'
-    ]
+
+    const COLLUMS = ['update_playlist', 'update_adv', 'updata_additional'];
 
     connection_station_data.query(`SELECT * FROM station WHERE id_station=${db.get("id")}`,
         function (err, results) {
@@ -66,7 +57,8 @@ module.exports.get_new_data = function () {
                 })
                 if(f) {
                     setTimeout(function () {
-                        fs.writeFileSync(`server/logs.js`, `//RESTART STATION`, { flag: 'a' });
+                        killProcess('mpg321');
+                        fs.writeFileSync(`server/logs.js`, `//RESTART STATION\n`, { flag: 'a' });
                     },10000)}
             }
         });
@@ -74,13 +66,12 @@ module.exports.get_new_data = function () {
 }
 
 function reset(col, id_station, val = 0) {
-    let connection_reset = mysql.createConnection({
-        host: 'infiniti-pro.com',
-        user: 'u_stations_lj',
-        database: 'stations_list_infiniti',
-        password: 'fpCB4MZ5'
-    });
+    let connection_reset = mysql.createConnection({ host: 'infiniti-pro.com', user: 'u_stations_lj', database: 'stations_list_infiniti', password: 'fpCB4MZ5'});
     connection_reset.query(`UPDATE station set ${col} = ${val} WHERE id_station=${id_station}`,function (err) {});
 
+    if(db.get('update_playlist') == 1){ 
+        db.set('update_playlist', 2); 
+        const child_update_playlist = fork('get_playlists');
+        child_update_playlist.on('message', message => { console.log(message) }) 
+    }
 }
-

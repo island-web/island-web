@@ -1,7 +1,7 @@
 //Функция проверки наличия файла
 const db = require('croxydb');
 const host = 'https://infiniti-pro.com/';
-const https = require('node:https');
+const https = require('https');
 const fs = require('fs');
 const shell = require('shelljs');
 
