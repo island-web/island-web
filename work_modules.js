@@ -29,15 +29,15 @@ if (now_time > data_station.start_work && now_time < data_station.stop_work && d
         if (db.get('update_playlist') == 2) process.send('UPDATE_SONGS');
         checkAudioForDownload(db.get('adv'), 'adv/');
         checkAudioForDownload(db.get('music_my_playlist'), 'music/');
-        //send_info_to_server.send_status();
         sortAdv();
         make.get_new_data();
 
     }, 60000);
 
-    send_info_to_server.send_log(`START_WORK_STATION`, 0, `work`, now_full_day);
-
-    if (process.send) process.send(`START_WORK_STATION`);
+    
+    setTimeout(() => { send_info_to_server.send_log(`START_WORK_STATION`, 0, `work`, now_full_day);}, 1000)
+    setTimeout(() => { process.send(`START_WORK_STATION`) }, 3000)
+    
 
 } else {
     console.log(`SLEEP STATION - ${data_station.name_station}`);

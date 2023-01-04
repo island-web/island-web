@@ -31,7 +31,6 @@ connection.query(`SELECT id_program FROM stations_program WHERE id_station = ${d
         }
         else {
             db.delete('adv');
-            console.log(colors.black('[ LIST_ACTUAL_ADV ]:'));
             results.forEach(ad => {
                 connection_adv.query(`SELECT * FROM adv_program WHERE id_program = ${ad.id_program}`,
                     function (err, results_adv) {
@@ -44,10 +43,6 @@ connection.query(`SELECT id_program FROM stations_program WHERE id_station = ${d
                             results_adv.forEach(r_ad => {
                                 if (day.format(r_ad.date_stop, 'YYYY/MM/DD') >= today) {
                                     db.push('adv', r_ad);
-                                    console.log(colors.yellow('************************************************************************'));
-                                    console.log(colors.dim(`${r_ad.name_adv} [${r_ad.time_start} - ${r_ad.time_stop}]`));
-                                    console.log(colors.yellow('************************************************************************'));
-
                                 }
                             });
                         }

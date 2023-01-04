@@ -63,7 +63,7 @@ function command(mes) {
         console.log(m);
         setTimeout(function () {
           killProcess('mpg321');
-          fs.writeFileSync(`server/logs.js`, `//RESTART STATION\n`, { flag: 'a+' });
+          fs.writeFileSync(`server/logs.js`, `//RESTART STATION\n`, { flag: 'a' });
         },
           10000)
       })

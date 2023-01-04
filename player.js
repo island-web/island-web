@@ -95,13 +95,17 @@ function shuffle(arr) {
 }
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
-console.log("HELLO I`M PLAYER");
 
 let list_music = [];
 
-db.get("music_my_playlist").forEach(song => {
-    if (song['artist'] && song['name_song'] != '') {
-        list_music.push(`${song['artist']}-${song['name_song']}.mp3`);
+(db.get("music_my_playlist") || 'ERROR').forEach(song => {
+    if(song == 'ERROR'){
+        killProcess('mpg321');
+        fs.writeFileSync(`server/logs.js`, `//RESTART STATION\n`, { flag: 'a' });
+    }else{
+        if (song['artist'] && song['name_song'] != '') {
+            list_music.push(`${song['artist']}-${song['name_song']}.mp3`);
+        }    
     }
 });
 

@@ -39,5 +39,5 @@ module.exports.send_status = function () {
     connection_online.query(`UPDATE station set online_date=CURRENT_DATE() WHERE id_station=${station[0].id_station}`,
         function (err) { if(err) console.log(` ERROR_CONNECT_DB_LOGS_STR_32 ========> ${err}`) })
     connection_online.end();
-    console.log(colors.green('STATUS_ONLINE_STATION_SEND_TO_SERVER'));
+    //console.log(colors.green('STATUS_ONLINE_STATION_SEND_TO_SERVER'));
 }
