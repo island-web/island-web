@@ -17,24 +17,26 @@ let now_time = date.format(new Date(), 'HH:mm:ss');
 sortAdv();
 make.delete_old_adv();
 make.get_new_data();
-//****************************************************************************************************** */
-//****************************************************************************************************** */
 let data_station = db.get("data_station")[0];
+
+//****************************************************************************************************** */
+//****************************************************************************************************** */
+
 if (now_time > data_station.start_work && now_time < data_station.stop_work && db.get("initialization") > 2) {
 
-    setInterval(() => { 
-
-        if(db.get('update_playlist') == 2) process.send('UPDATE_SONGS'); 
-        checkAudioForDownload(db.get('adv'), 'adv/'); 
-        checkAudioForDownload(db.get('music_my_playlist'), 'music/'); 
-        send_info_to_server.send_status(); 
-        sortAdv(); 
+    setInterval(() => {
+        
+        if (db.get('update_playlist') == 2) process.send('UPDATE_SONGS');
+        checkAudioForDownload(db.get('adv'), 'adv/');
+        checkAudioForDownload(db.get('music_my_playlist'), 'music/');
+        //send_info_to_server.send_status();
+        sortAdv();
         make.get_new_data();
 
     }, 60000);
 
     send_info_to_server.send_log(`START_WORK_STATION`, 0, `work`, now_full_day);
-    
+
     if (process.send) process.send(`START_WORK_STATION`);
 
 } else {
@@ -89,10 +91,10 @@ function checkAudioForDownload(arr, path) {
         let func;
         let name;
         arr.forEach(el => {
-            if (path == 'adv/'){ name = el.name_adv; buff = 'buffer_download_adv'; func = 'DOWNLOAD_ADV'; }
+            if (path == 'adv/') { name = el.name_adv; buff = 'buffer_download_adv'; func = 'DOWNLOAD_ADV'; }
             else { name = `${el['artist']}-${el['name_song']}.mp3`; buff = 'buffer_download'; func = 'DOWNLOAD_SONGS'; }
 
-            if(!checkFile(name, path)) db.push(buff, name);
+            if (!checkFile(name, path)) db.push(buff, name);
         });
 
         if (db.get(buff)) { console.log(func); process.send(func) }
@@ -102,33 +104,20 @@ function checkAudioForDownload(arr, path) {
 //****************************************************************************************************** */
 //****************************************************************************************************** */
 function sortAdv() {
-    if(db.get('adv')){
+    if (db.get('adv')) {
 
-        db.delete('adv_interval')
-        db.delete('adv_fixed')
-    
+        db.set('adv_interval', []);
+        db.set('adv_fixed', []);
         db.get('adv').forEach(element => {
             if (today >= date.format(new Date(element.date_start), 'YYYY/MM/DD') && today <= date.format(new Date(element.date_stop), 'YYYY/MM/DD')) {
-                if (element.type == 'fix') { 
-                    db.push('adv_fixed', element); 
+                if (element.type == 'fix') {
+                    db.push('adv_fixed', element);
                 }
                 else if (element.type == 'interval_t') {
-                    let flag = false;
-                    if(db.get('adv_interval')){
-                        db.get('adv_interval').forEach(el => {
-                            if (el[0].interval == element.interval_t) {
-                                el[1].list.push(element);
-                                flag = true;
-                            }
-                        });    
-                    }
-                    if (!flag) {
-                        db.push('adv_interval',[{ interval: element.interval_t }, { list: [element] }]);
-                    }
+                    db.push('adv_interval', [{ interval: element.interval_t }, { list_adv: [element] }]);
                 }
             }
         });
-    
     }
 }
 

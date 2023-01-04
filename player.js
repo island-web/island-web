@@ -68,13 +68,13 @@ function check_time_fix_adv(all_duration) {
     let start_interval = new Date();
     let end_interval = new Date(start_interval.getTime() + all_duration * 1000);
 
-    if(db.get('adv_fixed')){
+    if (db.get('adv_fixed')) {
         db.get('adv_fixed').forEach(obj => {
-            if(date.format(start_interval, 'HH:mm:ss') <= obj.fix && date.format(end_interval, 'HH:mm:ss') >= obj.fix){
+            if (date.format(start_interval, 'HH:mm:ss') <= obj.fix && date.format(end_interval, 'HH:mm:ss') >= obj.fix) {
                 f = false;
                 console.log(f);
             }
-        });    
+        });
     }
     return f;
 }
@@ -129,7 +129,7 @@ player_songs.on('end', function () {
         list_music = shuffle(list_music);
     }
 
-    
+
     send_info_to_server.send_status();
     send_info_to_server.send_log(`START_PLAY_SONG ===>  ${list_music[count_list_songs]} `, 0, 'play', date.format(new Date(), 'YYYY/MM/DD HH:mm:ss'));
     player_songs.play(`music/${list_music[count_list_songs]}`);
@@ -147,7 +147,16 @@ player_songs.on('error', function (e) {
 
 
 child_interval.on('message', message => {
-    if (flag_play_adv || !check_time_fix_adv(message[1])) {
+    if (message == 'RESTART') {
+        let pause_interval = setInterval(function () {
+            volume_song -= 5;
+            player_songs.gain(volume_song);
+            if (volume_song == 0) {
+                killProcess('mpg321');
+                fs.writeFileSync(`server/logs.js`, `//RESTART STATION\n`, { flag: 'a' });
+            }
+        }, 500);
+    } else if (flag_play_adv || !check_time_fix_adv(message[1])) {
         buffer_for_wait = buffer_for_wait.concat(message);
     } else {
         flag_play_adv = true;
@@ -165,7 +174,7 @@ child_interval.on('message', message => {
 
 child_fixed.on('message', message => {
     flag_play_adv = true;
-    
+
     let pause_interval = setInterval(function () {
         volume_song -= 5;
         player_songs.gain(volume_song);
@@ -173,23 +182,23 @@ child_fixed.on('message', message => {
             player_songs.pause();
             player_fixed.gain(message.volume);
             player_fixed.play(`adv/${message.name_adv}`);
-            send_info_to_server.send_log(`START_PLAY_FIXED_ADV ===> ${message.name_adv}`, 0, 'play', now, 'adv');        
+            send_info_to_server.send_log(`START_PLAY_FIXED_ADV ===> ${message.name_adv}`, 0, 'play', now, 'adv');
             send_info_to_server.send_status();
             clearInterval(pause_interval);
         }
     }, 500);
 
-    player_fixed.on('end',function(){
-        if(buffer_for_wait.length == 0){
+    player_fixed.on('end', function () {
+        if (buffer_for_wait.length == 0) {
             flag_play_adv = false;
             volume_song = 70;
             player_songs.gain(volume_song);
-            player_songs.pause();    
-        }else{
+            player_songs.pause();
+        } else {
             let temp = buffer_for_wait;
             start_interval(temp);
             buffer_for_wait = [];
-        }        
+        }
     })
-    
+
 })
