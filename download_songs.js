@@ -9,11 +9,22 @@ const shell = require('shelljs');
 //****************************************************************************************************** */
 let count_songs_download = 0;
 let songs;
+function checkFile(name, path) {
+    let flag = true;
+    try {
+        fs.accessSync(path + name, fs.F_OK);
+    } catch (e) {
+        flag = false;
+    }
+    return flag;
+}
 
 if(db.get('initialization') == 2) {
     songs = [];
     db.get('music_my_playlist').forEach(element => {
-        songs.push(`${element['artist']}-${element['name_song']}.mp3`);
+        if(!checkFile(`${element['artist']}-${element['name_song']}.mp3`, `music/`)){
+            songs.push(`${element['artist']}-${element['name_song']}.mp3`);
+        }
     });
 }else{
     songs = db.get(`buffer_download`);

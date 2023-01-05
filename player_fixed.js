@@ -1,15 +1,17 @@
 const db = require("croxydb");
 const fork = require('child_process').fork;
 const date = require('date-and-time');
+const colors = require('colors');
+
 let play_now;
 
-setInterval(() => {
+fixed_interval = setInterval(() => {
 
     (db.get('adv_fixed') || ['ERROR']).forEach(obj => {
 
         if (obj == 'ERROR') {
-            killProcess('mpg321');
-            fs.writeFileSync(`server/logs.js`, `//RESTART STATION\n`, { flag: 'a' });
+            console.log(colors.cyan('[ DATA_FIXED_ADV_EMPTY ]'));
+            clearInterval(fixed_interval);
         } else {
 
             if (date.format(new Date(), 'HH:mm') == obj.fix.slice(0, 5) && obj.id_string != play_now) {

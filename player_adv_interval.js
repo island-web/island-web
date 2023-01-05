@@ -11,8 +11,7 @@ setTimeout(() => {
     (db.get('adv_interval') || ['ERROR']).forEach(obj => {
     
         if (obj == 'ERROR') {
-            killProcess('mpg321');
-            fs.writeFileSync(`server/logs.js`, `//RESTART STATION\n`, { flag: 'a' });
+            console.log(colors.cyan('[ DATA_INTERVAL_ADV_EMPTY ]'));
         }else{
             let push_play = [];
             let dur = 0;

@@ -45,7 +45,7 @@ function start_interval(list_adv) {
                 volume_song = 70;
                 player_songs.gain(volume_song);
                 player_songs.pause();
-
+                send_info_to_server.send_log(`END_PAUSE_PLAY_SONG ===>  ${list_music[count_list_songs]} `, 0, 'play', date.format(new Date(), 'YYYY/MM/DD HH:mm:ss'));
             }
             else {
                 let temp = buffer_for_wait;
@@ -100,8 +100,7 @@ let list_music = [];
 
 (db.get("music_my_playlist") || 'ERROR').forEach(song => {
     if(song == 'ERROR'){
-        killProcess('mpg321');
-        fs.writeFileSync(`server/logs.js`, `//RESTART STATION\n`, { flag: 'a' });
+        console.log(colors.cyan('[ DATA_PLAYLIST_EMPTY ]'));
     }else{
         if (song['artist'] && song['name_song'] != '') {
             list_music.push(`${song['artist']}-${song['name_song']}.mp3`);
@@ -198,6 +197,8 @@ child_fixed.on('message', message => {
             volume_song = 70;
             player_songs.gain(volume_song);
             player_songs.pause();
+            send_info_to_server.send_log(`END_PAUSE_PLAY_SONG ===>  ${list_music[count_list_songs]} `, 0, 'play', date.format(new Date(), 'YYYY/MM/DD HH:mm:ss'));
+
         } else {
             let temp = buffer_for_wait;
             start_interval(temp);

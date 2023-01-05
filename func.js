@@ -30,8 +30,7 @@ module.exports.delete_old_adv = function () {
 
 module.exports.get_new_data = function () {
     if(station[0].update_adv == 1){
-        console.log('add_adv');
-        setTimeout(function () { fs.writeFileSync(`server/logs.js`, `//RESTART STATION\n`, { flag: 'a' }); }, 2000 )
+        setTimeout(function () { fs.writeFileSync(`server/logs.js`, `//RESTART STATION\n`, { flag: 'a' }); }, 10000 )
     }
     
     const connection_station_data = mysql.createConnection({

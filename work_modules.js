@@ -21,8 +21,10 @@ let data_station = db.get("data_station")[0];
 
 //****************************************************************************************************** */
 //****************************************************************************************************** */
-
+let status = 0;
 if (now_time > data_station.start_work && now_time < data_station.stop_work && db.get("initialization") > 2) {
+
+    status = 1;
 
     setInterval(() => {
         
@@ -40,6 +42,7 @@ if (now_time > data_station.start_work && now_time < data_station.stop_work && d
     
 
 } else {
+    status = 0;
     console.log(`SLEEP STATION - ${data_station.name_station}`);
 }
 //****************************************************************************************************** */
@@ -47,15 +50,20 @@ if (now_time > data_station.start_work && now_time < data_station.stop_work && d
 
 //CHECK TIME START AND STOP WORK************************************************************************ */
 setInterval(function () {
-    if (date.format(new Date(), 'HH:mm:ss') == data_station.start_work || date.format(new Date(), 'HH:mm:ss') == data_station.stop_work) {
-        (data_station.status_work_day == false) ? db.set("status_work_day", "true") :
-            db.set("status_work_day", "true");
-        fs.writeFileSync(`server/logs.js`, `//RESTART STATION\n`, { flag: 'a+' });
+    if (date.format(new Date(), 'HH:mm:ss') == data_station.start_work) {
+        sortAdv();
+        make.delete_old_adv();
+        make.get_new_data();
+        killProcess('node');
+    }else if(date.format(new Date(), 'HH:mm:ss') == data_station.stop_work){
+        killProcess('mpg321');
+        killProcess('node');
     }
+    if(status == 0) { make.get_new_data(); }
 }, 1000)
 //****************************************************************************************************** */
 //****************************************************************************************************** */
-
+//if(db.get('status_work_day') == false) { make.get_new_data(); }
 //EVENT ADD NEW MODULES  
 const buttonPressesLogFile = 'server/modules.js';
 let md5Previous = null;
@@ -86,19 +94,27 @@ function checkFile(name, path) {
 
 function checkAudioForDownload(arr, path) {
 
-    if (arr.length > 0) {
-        let buff;
-        let func;
-        let name;
-        arr.forEach(el => {
-            if (path == 'adv/') { name = el.name_adv; buff = 'buffer_download_adv'; func = 'DOWNLOAD_ADV'; }
-            else { name = `${el['artist']}-${el['name_song']}.mp3`; buff = 'buffer_download'; func = 'DOWNLOAD_SONGS'; }
+    let buff;
+    let func;
+    let name;
+    if(arr){
+        (arr || ['ERROR']).forEach(el => {
 
-            if (!checkFile(name, path)) db.push(buff, name);
+            if (el == 'ERROR') {
+                
+            } else {
+    
+                if (path == 'adv/') { name = el.name_adv; buff = 'buffer_download_adv'; func = 'DOWNLOAD_ADV'; }
+                else { name = `${el['artist']}-${el['name_song']}.mp3`; buff = 'buffer_download'; func = 'DOWNLOAD_SONGS'; }
+    
+                if (!checkFile(name, path)) db.push(buff, name);
+            }
         });
-
+    
         if (db.get(buff)) { console.log(func); process.send(func) }
+    
     }
+
 }
 
 //****************************************************************************************************** */
